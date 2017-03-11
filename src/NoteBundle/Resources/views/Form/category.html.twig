@@ -1,0 +1,31 @@
+{# Notes/note.html.twig #}
+{% extends 'NoteBundle::layout.html.twig ' %}
+
+{% block title %}
+    
+    <title>    
+        {% if route == 'new' %}
+            New Category
+        {% elseif route == 'edit' %}
+            Edit Category
+        {% endif %}
+   </title>
+
+{% endblock %}
+
+{% block notepad_content %}
+
+    <div class="page-header">
+        {% if route == 'new' %}
+            <h1>New Category</h1>
+        {% elseif route == 'edit' %}
+            <h1>Edit Category</h1>
+        {% endif %}
+    </div>
+    
+    {% form_theme form 'bootstrap_3_layout.html.twig' %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+    {{ form_end(form) }}
+    
+{% endblock %}

@@ -1,0 +1,44 @@
+{# Notes/list.html.twig #}
+{% extends 'NoteBundle::layout.html.twig ' %}
+
+{% block title %}
+
+    <title>List of Notes</title>
+
+{% endblock %}
+
+{% block notepad_content %}
+    
+    <div class="page-header">
+        <h1>List of notes
+            <div class="btn-group pull-right">
+                <a role="button" class="btn btn-default" href="{{ path('newNote') }}">New Note</a>
+                <a role="button" class="btn btn-default" href="{{ path('newCategory') }}">New Category</a>
+            </div>
+        </h1>
+        
+        {% form_theme form 'bootstrap_3_layout.html.twig' %}
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+        {{ form_end(form) }}
+        
+    </div>
+
+    {% for note in notes %}
+        <div class="panel panel-notepad">
+            <div class="panel-heading">
+                {{ note.title }}
+                <span class="pull-right"><em>{{ note.category.label }}</em></span>
+            </div>
+            <div class="panel-body">{{ note.content }}</div>
+            <div class="panel-footer">
+                <a role="button" class="btn btn-primary" href="{{ path('editNote', { 'id': note.id }) }}">
+                <i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i>  Edit</a>
+                <a role="button" class="btn btn-danger" href="{{ path('delNote', { 'id': note.id }) }}">
+                <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>  Delete</a>
+                <em class="pull-right">{{ note.date.format('d/m/Y') }}</em>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
