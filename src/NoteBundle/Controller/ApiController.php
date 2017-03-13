@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class ApiController extends Controller
 {   
     /**
-     * @Route("/api/notes", name="APInotes")
+     * @Route("/api/notes", name="APInotesGetAll")
      * @Method("GET")
      */
     public function listNotesAction()
@@ -39,17 +39,17 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/note/g", name="APIgetNote")
+     * @Route("/api/notes/{id}", name="APInotesGetOne", requirements={"id": "\d+"})
      * @Method("GET")
      */
-    public function getNoteAction(Request $request)
+    public function getNoteAction(Request $request, $id)
     {
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
         $em = $this->getDoctrine()->getManager();
 
-        $id = $request->query->get('id');
+        //$id = $request->query->get('id');
         if(!$id) {
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
@@ -66,7 +66,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/categories", name="APIcategories")
+     * @Route("/api/categories", name="APIcategoriesGetAll")
      * @Method("GET")
      */
     public function listCategoriesAction()
@@ -87,7 +87,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/note/n", name="APInewNote")
+     * @Route("/api/notes", name="APInotesCreate")
      * @Method("POST")
      */
     public function newNoteAction(Request $request)
@@ -134,7 +134,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/note/e", name="APIeditNote")
+     * @Route("/api/notes", name="APInotesUpdate")
      * @Method("PUT")
      */
     public function editNoteAction(Request $request)
@@ -186,23 +186,23 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/note/d", name="APIdelNote")
+     * @Route("/api/notes/{id}", name="APInotesDelete", requirements={"id": "\d+"})
      * @Method("DELETE")
      */
-    public function delNoteAction(Request $request)
+    public function delNoteAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
         $data = json_decode($json, true);
-
+        /*
         try {
             $id = $data['id'];
         } catch (\ErrorException $e) {
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
             return new Response($jsonContent);
-        }
+        }*/
 
         $note = $em->getRepository('NoteBundle:Note')->find($id);
         if (!$note) {
@@ -225,7 +225,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/category/n", name="APInewCategory")
+     * @Route("/api/categories", name="APIcategoriesCreate")
      * @Method("POST")
      */
     public function newCategoryAction(Request $request)
@@ -259,7 +259,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/category/e", name="APIeditCategory")
+     * @Route("/api/categories", name="APIcategoriesUpdate")
      * @Method("PUT")
      */
     public function editCategoryAction(Request $request)
@@ -299,23 +299,23 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/api/category/d", name="APIdelCategory")
+     * @Route("/api/categories/{id}", name="APIcategoriesDelete", requirements={"id": "\d+"})
      * @Method("DELETE")
      */
-    public function delCategoryAction(Request $request)
+    public function delCategoryAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
         $data = json_decode($json, true);
-        
+        /*
         try {
             $id = $data['id'];
         } catch (\ErrorException $e) {
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
             return new Response($jsonContent);
-        }
+        }*/
 
         $category = $em->getRepository('NoteBundle:Category')->find($id);
         if (!$category) {
