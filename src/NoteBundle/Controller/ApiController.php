@@ -21,8 +21,10 @@ class ApiController extends Controller
      * @Route("/api/notes", name="APInotesGetAll")
      * @Method("GET")
      */
-    public function listNotesAction()
+    public function listNotesAction(Request $request)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -30,12 +32,16 @@ class ApiController extends Controller
 
         $notes = $em->getRepository('NoteBundle:Note')->findAll();
         if (!$notes) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "notes not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
+        $resp->setStatusCode(Response::HTTP_OK);
         $jsonContent = $serializer->serialize($notes, 'json');
-        return new Response($jsonContent);
+        $resp->setContent($jsonContent);
+        return $resp;
     }
 
     /**
@@ -44,33 +50,42 @@ class ApiController extends Controller
      */
     public function getNoteAction(Request $request, $id)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
         $em = $this->getDoctrine()->getManager();
 
-        //$id = $request->query->get('id');
         if(!$id) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         $note = $em->getRepository('NoteBundle:Note')->find($id);
         if (!$note) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "note not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
+        $resp->setStatusCode(Response::HTTP_OK);
         $jsonContent = $serializer->serialize($note, 'json');
-        return new Response($jsonContent);
+        $resp->setContent($jsonContent);
+        return $resp;
     }
 
     /**
      * @Route("/api/categories", name="APIcategoriesGetAll")
      * @Method("GET")
      */
-    public function listCategoriesAction()
+    public function listCategoriesAction(Request $request)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -78,12 +93,16 @@ class ApiController extends Controller
 
         $categories = $em->getRepository('NoteBundle:Category')->findAll();
         if (!$categories) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "categories not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
+        $resp->setStatusCode(Response::HTTP_OK);
         $jsonContent = $serializer->serialize($categories, 'json');
-        return new Response($jsonContent);
+        $resp->setContent($jsonContent);
+        return $resp;
     }
 
     /**
@@ -92,6 +111,8 @@ class ApiController extends Controller
      */
     public function newNoteAction(Request $request)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -103,9 +124,11 @@ class ApiController extends Controller
             $date = new \DateTime($data['date']);
             $categoryId = $data['categoryId'];
         } catch (\ErrorException $e) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         
         $note = new Note();
@@ -114,22 +137,29 @@ class ApiController extends Controller
         $note->setDate($date);
         $category = $em->getRepository('NoteBundle:Category')->find($categoryId);
         if (!$category) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "category not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         $note->setCategory($category);
 
         try {
             $em->persist($note);
             $em->flush();
-            $response = array('success' => true);
+            $resp->setStatusCode(Response::HTTP_OK);
+            $uri = '/notes/'.$note->getId();
+            $response = array('success' => true, 'uri' => $uri);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         } catch(Exception $e) {
-            $response = array('success' => false);
+            $resp->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response = array('failure' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
     }
 
@@ -139,6 +169,8 @@ class ApiController extends Controller
      */
     public function editNoteAction(Request $request)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -151,37 +183,47 @@ class ApiController extends Controller
             $date = new \DateTime($data['date']);
             $categoryId = $data['categoryId'];
         } catch (\ErrorException $e) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
 
         $note = $em->getRepository('NoteBundle:Note')->find($id);
         if (!$note) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "note not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         $note->setTitle($title);
         $note->setContent($content);
         $note->setDate($date);
         $category = $em->getRepository('NoteBundle:Category')->find($categoryId);
         if (!$category) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "category not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         $note->setCategory($category);
 
         try {
             $em->flush();
+            $resp->setStatusCode(Response::HTTP_OK);
             $response = array('success' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         } catch(Exception $e) {
-            $response = array('success' => false);
+            $resp->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response = array('failure' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
     }
 
@@ -191,36 +233,44 @@ class ApiController extends Controller
      */
     public function delNoteAction(Request $request, $id)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
         $data = json_decode($json, true);
-        /*
-        try {
-            $id = $data['id'];
-        } catch (\ErrorException $e) {
+
+        if(!$id) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
-        }*/
+            $resp->setContent($jsonContent);
+            return $resp;
+        }
 
         $note = $em->getRepository('NoteBundle:Note')->find($id);
         if (!$note) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "note not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
 
         try {
             $em->remove($note);
             $em->flush();
+            $resp->setStatusCode(Response::HTTP_OK);
             $response = array('success' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         } catch(Exception $e) {
-            $response = array('success' => false);
+            $resp->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response = array('failure' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
     }
 
@@ -230,6 +280,8 @@ class ApiController extends Controller
      */
     public function newCategoryAction(Request $request)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -238,9 +290,11 @@ class ApiController extends Controller
         try {
             $label = $data['label'];
         } catch (\ErrorException $e) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         $category = new Category();
         $category->setLabel($label);
@@ -248,13 +302,17 @@ class ApiController extends Controller
         try {
             $em->persist($category);
             $em->flush();
+            $resp->setStatusCode(Response::HTTP_OK);
             $response = array('success' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         } catch(Exception $e) {
-            $response = array('success' => false);
+            $resp->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response = array('failure' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
     }
 
@@ -264,6 +322,8 @@ class ApiController extends Controller
      */
     public function editCategoryAction(Request $request)
     {   
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -273,28 +333,36 @@ class ApiController extends Controller
             $id = $data['id'];
             $label = $data['label'];
         } catch (\ErrorException $e) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
 
         $category = $em->getRepository('NoteBundle:Category')->find($id);
         if (!$category) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "category not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
         $category->setLabel($label);
 
         try {
             $em->flush();
+            $resp->setStatusCode(Response::HTTP_OK);
             $response = array('success' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         } catch(Exception $e) {
-            $response = array('success' => false);
+            $resp->setStatusCode(Response::HTTP_FORBIDDEN);
+            $response = array('failure' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
     }
 
@@ -304,36 +372,44 @@ class ApiController extends Controller
      */
     public function delCategoryAction(Request $request, $id)
     {
+        $resp = new Response();
+        $resp->headers->set('Content-Type', 'application/json');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
         $data = json_decode($json, true);
-        /*
-        try {
-            $id = $data['id'];
-        } catch (\ErrorException $e) {
+
+        if(!$id) {
+            $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
             $response = array('error' => "incomplete data");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
-        }*/
+            $resp->setContent($jsonContent);
+            return $resp;
+        }
 
         $category = $em->getRepository('NoteBundle:Category')->find($id);
         if (!$category) {
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
             $response = array('error' => "category not found");
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
 
         try {
             $em->remove($category);
             $em->flush();
+            $resp->setStatusCode(Response::HTTP_OK);
             $response = array('success' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         } catch(Exception $e) {
-            $response = array('success' => false);
+            $resp->setStatusCode(Response::HTTP_NOT_FOUND);
+            $response = array('failure' => true);
             $jsonContent = json_encode($response);
-            return new Response($jsonContent);
+            $resp->setContent($jsonContent);
+            return $resp;
         }
     }
 }
