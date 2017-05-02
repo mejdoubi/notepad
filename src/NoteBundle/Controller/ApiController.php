@@ -18,13 +18,30 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class ApiController extends Controller
 {   
     /**
+     * CORS preflight request
+     */
+    private function corsPreflightRequest()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+    }
+
+    /**
      * @Route("/api/notes", name="APInotesGetAll")
-     * @Method("GET")
+     * @Method({"GET", "OPTIONS"})
      */
     public function listNotesAction(Request $request)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -46,12 +63,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes/{id}", name="APInotesGetOne", requirements={"id": "\d+"})
-     * @Method("GET")
+     * @Method({"GET", "OPTIONS"})
      */
     public function getNoteAction(Request $request, $id)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -80,12 +100,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories", name="APIcategoriesGetAll")
-     * @Method("GET")
+     * @Method({"GET", "OPTIONS"})
      */
     public function listCategoriesAction(Request $request)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -107,12 +130,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes", name="APInotesCreate")
-     * @Method("POST")
+     * @Method({"POST", "OPTIONS"})
      */
     public function newNoteAction(Request $request)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -121,7 +147,6 @@ class ApiController extends Controller
         try {
             $title = $data['title'];
             $content = $data['content'];
-            $date = new \DateTime($data['date']);
             $categoryId = $data['categoryId'];
         } catch (\ErrorException $e) {
             $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
@@ -134,7 +159,7 @@ class ApiController extends Controller
         $note = new Note();
         $note->setTitle($title);
         $note->setContent($content);
-        $note->setDate($date);
+        $note->setDate(new \DateTime('today'));
         $category = $em->getRepository('NoteBundle:Category')->find($categoryId);
         if (!$category) {
             $resp->setStatusCode(Response::HTTP_NOT_FOUND);
@@ -149,7 +174,7 @@ class ApiController extends Controller
             $em->persist($note);
             $em->flush();
             $resp->setStatusCode(Response::HTTP_OK);
-            $uri = '/notes/'.$note->getId();
+            $uri = 'api/notes/'.$note->getId();
             $response = array('success' => true, 'uri' => $uri);
             $jsonContent = json_encode($response);
             $resp->setContent($jsonContent);
@@ -165,12 +190,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes", name="APInotesUpdate")
-     * @Method("PUT")
+     * @Method({"PUT", "OPTIONS"})
      */
     public function editNoteAction(Request $request)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'PUT, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -180,7 +208,6 @@ class ApiController extends Controller
             $id = $data['id'];
             $title = $data['title'];
             $content = $data['content'];
-            $date = new \DateTime($data['date']);
             $categoryId = $data['categoryId'];
         } catch (\ErrorException $e) {
             $resp->setStatusCode(Response::HTTP_BAD_REQUEST);
@@ -200,7 +227,6 @@ class ApiController extends Controller
         }
         $note->setTitle($title);
         $note->setContent($content);
-        $note->setDate($date);
         $category = $em->getRepository('NoteBundle:Category')->find($categoryId);
         if (!$category) {
             $resp->setStatusCode(Response::HTTP_NOT_FOUND);
@@ -229,12 +255,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes/{id}", name="APInotesDelete", requirements={"id": "\d+"})
-     * @Method("DELETE")
+     * @Method({"DELETE", "OPTIONS"})
      */
     public function delNoteAction(Request $request, $id)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -276,12 +305,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories", name="APIcategoriesCreate")
-     * @Method("POST")
+     * @Method({"POST", "OPTIONS"})
      */
     public function newCategoryAction(Request $request)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -318,12 +350,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories", name="APIcategoriesUpdate")
-     * @Method("PUT")
+     * @Method({"PUT", "OPTIONS"})
      */
     public function editCategoryAction(Request $request)
     {   
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'PUT, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -368,12 +403,15 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories/{id}", name="APIcategoriesDelete", requirements={"id": "\d+"})
-     * @Method("DELETE")
+     * @Method({"DELETE", "OPTIONS"})
      */
     public function delCategoryAction(Request $request, $id)
     {
+        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
+        $resp->headers->set('Access-Control-Allow-Origin', '*');
+        $resp->headers->set('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
