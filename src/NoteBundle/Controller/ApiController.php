@@ -18,10 +18,12 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class ApiController extends Controller
 {   
     /**
-     * CORS preflight request
+     * @Route("/api/notes", name="APInotesGetAll")
+     * @Method({"OPTIONS", "GET"})
      */
-    private function corsPreflightRequest()
+    public function listNotesAction(Request $request)
     {
+        // CORS preflight request
         if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
             $response = new Response();
             $response->headers->set('Content-Type', 'application/text');
@@ -29,19 +31,11 @@ class ApiController extends Controller
             $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
             return $response;
         }
-    }
 
-    /**
-     * @Route("/api/notes", name="APInotesGetAll")
-     * @Method({"GET", "OPTIONS"})
-     */
-    public function listNotesAction(Request $request)
-    {
-        $this->corsPreflightRequest();
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -63,15 +57,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes/{id}", name="APInotesGetOne", requirements={"id": "\d+"})
-     * @Method({"GET", "OPTIONS"})
+     * @Method({"OPTIONS", "GET"})
      */
     public function getNoteAction(Request $request, $id)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -100,15 +102,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories", name="APIcategoriesGetAll")
-     * @Method({"GET", "OPTIONS"})
+     * @Method({"OPTIONS", "GET"})
      */
     public function listCategoriesAction(Request $request)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $encoders = array(new XmlEncoder(), new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
@@ -130,15 +140,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes", name="APInotesCreate")
-     * @Method({"POST", "OPTIONS"})
+     * @Method({"OPTIONS", "POST"})
      */
     public function newNoteAction(Request $request)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -190,15 +208,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes", name="APInotesUpdate")
-     * @Method({"PUT", "OPTIONS"})
+     * @Method({"OPTIONS", "PUT"})
      */
     public function editNoteAction(Request $request)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -255,15 +281,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/notes/{id}", name="APInotesDelete", requirements={"id": "\d+"})
-     * @Method({"DELETE", "OPTIONS"})
+     * @Method({"OPTIONS", "DELETE"})
      */
     public function delNoteAction(Request $request, $id)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -305,15 +339,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories", name="APIcategoriesCreate")
-     * @Method({"POST", "OPTIONS"})
+     * @Method({"OPTIONS", "POST"})
      */
     public function newCategoryAction(Request $request)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -350,15 +392,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories", name="APIcategoriesUpdate")
-     * @Method({"PUT", "OPTIONS"})
+     * @Method({"OPTIONS", "PUT"})
      */
     public function editCategoryAction(Request $request)
     {   
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
@@ -403,15 +453,23 @@ class ApiController extends Controller
 
     /**
      * @Route("/api/categories/{id}", name="APIcategoriesDelete", requirements={"id": "\d+"})
-     * @Method({"DELETE", "OPTIONS"})
+     * @Method({"OPTIONS", "DELETE"})
      */
     public function delCategoryAction(Request $request, $id)
     {
-        $this->corsPreflightRequest();
+        // CORS preflight request
+        if($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/text');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+            return $response;
+        }
+
         $resp = new Response();
         $resp->headers->set('Content-Type', 'application/json');
         $resp->headers->set('Access-Control-Allow-Origin', '*');
-        $resp->headers->set('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
+        $resp->headers->set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
         $em = $this->getDoctrine()->getManager();
 
         $json = $request->getContent();
