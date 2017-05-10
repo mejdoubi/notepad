@@ -52,3 +52,7 @@ body {
     height: 60px;
     line-height: 60px;
 }
+
+modal {
+    color: #555555;
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notepad</title>
+    <base href="http://localhost:8080/symfony/notepad/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="icon" href="http://localhost:8080/symfony/notepad/web/notepad.ico">
+    <link rel="stylesheet" href="http://localhost:8080/symfony/notepad/web/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://localhost:8080/symfony/notepad/web/css/main.css">
+    <link rel="stylesheet" href="http://localhost:8080/symfony/notepad/web/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+</head>
+<body>
+    <notepad-app>Loading the page ...</notepad-app>
+    
+    <footer class="footer bg-2 text-center">
+        <div class="container">
+            <span>ECAM - Othman Mejdoubi</span>
+        </div>
+    </footer>
+
+    <script src="http://localhost:8080/symfony/notepad/web/js/jquery-3.1.1.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="http://localhost:8080/symfony/notepad/web/js/bootstrap.min.js"></script>
+    <!--
+    <script src="web/js/main.js"></script>
+    -->
+    <script type="text/javascript" src="{{ asset('bundles/note/js/inline.bundle.js')}}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/note/js/polyfills.bundle.js')}}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/note/js/vendor.bundle.js')}}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/note/js/main.bundle.js')}}"></script>
+</body>
+</html>
